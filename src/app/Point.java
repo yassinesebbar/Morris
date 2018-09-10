@@ -18,31 +18,41 @@ public class Point {
 	public Point()
 	{
 		for (Points P : Points.values())
-				MapPoints.put(P, ".");
+				MapPoints.put(P, "EMPTY");
 			
 	}
 	
-	public void setPointValue(Points point, String pointVal) 
+	public void changeStatPoint(Points point, String pointVal) 
 	{
-		if(pointVal == "W" || pointVal == "Z") {
 			MapPoints.put(point, pointVal);
-		}
 	}
 	
-	public String[] getPointValues() 
+//	public String[] getPointValues() 
+//	{
+//		
+//		String[] pointValues = new String[24];
+//		int countIndex = 0;
+//		Iterator<Points> Itr = MapPoints.keySet().iterator();
+//		
+//		while(Itr.hasNext()) {
+//			pointValues[countIndex] = MapPoints.get(Itr.next());
+//			countIndex++;
+//		}
+//		
+//		return pointValues;
+//	}
+	
+	public Boolean isPointEmpty(Points Point)
 	{
-		
-		String[] pointValues = new String[24];
-		int countIndex = 0;
-		Iterator<Points> Itr = MapPoints.keySet().iterator();
-		
-		while(Itr.hasNext()) {
-			pointValues[countIndex] = MapPoints.get(Itr.next());
-			countIndex++;
+		Boolean status;
+		if(MapPoints.get(Point) == "EMPTY") {
+			status = true;
+		}else {
+			status = false;
 		}
 		
-		return pointValues;
-
+		return status;
 	}
+	
 	
 }
