@@ -6,29 +6,75 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-enum Point
-{
-	A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X;	
-}
-
-Map<Points, String> MapPoints = new HashMap<Points, String>();
-
-
 public class Board {
 	
+	private Map<Character, Point> MapPoints = new HashMap<Character, Point>();
 	private String[] boardGame;
-	private Point Point;
+	
 	public Board()
-	{
-		boardGame = BoardGeometric.LAYOUT;
-		Point = new Point();
+	{	
+		for(char Char = 'A'; Char <= 88; Char++) {
+			MapPoints.put(Char, Point.EMPTY);
+		}
 		
+		boardGame = BoardGeometric.LAYOUT;	
 	}
 	
 	public void printBoard()
 	{
+		String Board = "";
+		String LBoard = "";
+		String RBoard = "";
+		String space = "                ";
+		char SpecialChar;
+
+		for (int i = 0; i < boardGame.length; i++) {
+			RBoard = "";
+			LBoard = "";
 			
+			for (char ch: boardGame[i].toCharArray()) {
+				SpecialChar = ch;
+				RBoard += ch;
+				
+				for (Map.Entry<Character, Point> entry : MapPoints.entrySet()) {
+					if(entry.getKey() == ch) {
+						if(entry.getValue() == Point.EMPTY) {
+							SpecialChar = '.';
+						}else if(entry.getValue() == Point.W || entry.getValue() == Point.Z) {
+							if(entry.getValue() == Point.W) {
+								SpecialChar = 'W';
+							}else {
+								SpecialChar = 'Z';
+							}
+						}						
+					}
+				}
+				
+				LBoard += SpecialChar;
+
+			}
+			Board += LBoard + space + RBoard + "\n";
+		}
 		
+	    System.out.println(Board);
+
+	}
+	
+	public boolean checkIfValidPoint(String Point) {
+		boolean valid = true;
+		
+		for (char ch: Point.toCharArray()) {
+			
+			if(ch < 65 || ch > 88 ) {
+				valid = false;
+			}
+		}
+
+		return valid;
+	}
+	
+	public boolean checkIfPointEmpty() {
+		return true;
 	}
 		
 }

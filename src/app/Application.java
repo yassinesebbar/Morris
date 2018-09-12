@@ -13,10 +13,10 @@ public class Application {
 	    System.out.println("Do you want to play a Game?");
 	    
 	    System.out.println("y/n");
-	    Scanner submitPlayer = new Scanner(System.in);
+	    Scanner in = new Scanner(System.in);
 
 	    while(true) {
-		    String anser = submitPlayer.nextLine();
+		    String anser = in.nextLine();
 		    
 		    if(anser.equals("y")) {
 		    	Morris Morris = new Morris();
@@ -25,7 +25,6 @@ public class Application {
 	          
 		    }else if(anser.equals("n")) 
 		    {
-		    	submitPlayer.close();
 
 		    	System.exit(1);
 		    }else {
@@ -34,9 +33,6 @@ public class Application {
 			   	
 	    }
 	    
-    	submitPlayer.close();
-
-
 	}
 	
 

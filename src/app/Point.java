@@ -6,26 +6,26 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-enum Points
+enum Point
 {
-	A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X;	
+	W,Z,EMPTY;	
 }
 
-public class Point {
-
-	Map<Points, String> MapPoints = new HashMap<Points, String>();
-	
-	public Point()
-	{
-		for (Points P : Points.values())
-				MapPoints.put(P, "EMPTY");
-			
-	}
-	
-	public void changeStatPoint(Points point, String pointVal) 
-	{
-			MapPoints.put(point, pointVal);
-	}
+//public class Point {
+//
+//	Map<Points, String> MapPoints = new HashMap<Points, String>();
+//	
+//	public Point()
+//	{
+//		for (Points P : Points.values())
+//				MapPoints.put(P, "EMPTY");
+//			
+//	}
+//	
+//	public void changeStatPoint(Points point, String pointVal) 
+//	{
+//			MapPoints.put(point, pointVal);
+//	}
 	
 //	public String[] getPointValues() 
 //	{
@@ -42,17 +42,17 @@ public class Point {
 //		return pointValues;
 //	}
 	
-	public Boolean isPointEmpty(Points Point)
-	{
-		Boolean status;
-		if(MapPoints.get(Point) == "EMPTY") {
-			status = true;
-		}else {
-			status = false;
-		}
-		
-		return status;
-	}
+//	public Boolean isPointEmpty(Points Point)
+//	{
+//		Boolean status;
+//		if(MapPoints.get(Point) == "EMPTY") {
+//			status = true;
+//		}else {
+//			status = false;
+//		}
+//		
+//		return status;
+//	}
 	
 	
-}
+//}

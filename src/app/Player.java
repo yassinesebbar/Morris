@@ -3,6 +3,7 @@ package app;
 public class Player {
 	private String username;
 	private String color;
+	private int pieces = 9;
 	
 	public Player(String name) {
 		username = name;
@@ -18,6 +19,14 @@ public class Player {
 	
 	public String getColor() {
 		return color;
+	}
+	
+	public int getPieces() {
+		return pieces;
+	}
+	
+	public int minusOnepiece() {
+		return pieces--;
 	}
 	
 }
