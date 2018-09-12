@@ -66,17 +66,12 @@ public class Morris {
 	{
 		Board Board = new Board();
 
+		GAME:
 		while(running) {
 
-
+	        System.out.println("*** Fase " + fase + " van het spel begint nu *** ");
 			while(fase > 0) {
-
-				
-		        System.out.println( White.getUsername() + " (" + White.getColor() + ") ----------Morris Fase " + this.fase +"------ " + Black.getUsername() + " (" + Black.getColor() + ")");
 		        
-		        System.out.println("*** Fase " + fase + " van het spel begint nu *** ");
-
-				
 					WHITE:
 					while(White.getPieces() > 0) {
 						Board.printBoard();
@@ -86,14 +81,31 @@ public class Morris {
 						}	
 						
 						String WPoint = SC.nextLine().toUpperCase();
+						if(WPoint.equals("") || WPoint.equals(" ")) {
+							continue;
+						}
 						
 						if(Board.checkIfValidPoint(WPoint)) {
-				        	System.out.println(WPoint);					
-
+							if(fase == 1) {
+								for (char ch: WPoint.toCharArray()) {
+									
+									if(Board.checkIfPointEmpty(ch)) {
+										Board.FillPoint(ch, White.getColor());
+									}
+									break;
+								}
+							}
 						}else {
 				        	System.out.println("*** Dat punt bestaat niet ***");					
 						}
-														        	
+						
+						while(Board.hasMill(White.getColor())) {
+				        	System.out.println(White.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");					
+							String MillPoint = SC.nextLine().toUpperCase();
+
+						}
+						
+						break;
 					}
 	        	
 	        		BLACK:
@@ -104,17 +116,39 @@ public class Morris {
 				        	System.out.println(Black.getUsername() + ", geef het punt waar je een pion wilt zetten ");					
 						}	
 						
-						String BPoint = SC.nextLine();
+						String BPoint = SC.nextLine().toUpperCase();
+						if(BPoint.equals("") || BPoint.equals(" ")) {
+							continue;
+						}
 						
 						if(Board.checkIfValidPoint(BPoint)) {
-							
+							if(fase == 1) {
+								for (char ch: BPoint.toCharArray()) {
+									
+									if(Board.checkIfPointEmpty(ch)) {
+										Board.FillPoint(ch, Black.getColor());
+										Black.minusOnepiece();
+									}
+									
+									break;
+								}
+							}
+
 						}else {
 				        	System.out.println("*** Dat punt bestaat niet ***");					
 						}
-														        	
-					}	
-				
-
+						
+						if(fase == 1 && Black.getPieces() == 0) {
+							fase++;
+							continue GAME;
+						}
+						
+						break;
+						
+					}
+					
+					
+	
 			}
 			
 		}

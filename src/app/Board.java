@@ -10,6 +10,9 @@ public class Board {
 	
 	private Map<Character, Point> MapPoints = new HashMap<Character, Point>();
 	private String[] boardGame;
+	private int Wpieces = 0;
+	private int Bpieces = 0;
+	private String[] Mills;
 	
 	public Board()
 	{	
@@ -18,6 +21,7 @@ public class Board {
 		}
 		
 		boardGame = BoardGeometric.LAYOUT;	
+		Mills = BoardGeometric.MILLS;
 	}
 	
 	public void printBoard()
@@ -57,7 +61,6 @@ public class Board {
 		}
 		
 	    System.out.println(Board);
-
 	}
 	
 	public boolean checkIfValidPoint(String Point) {
@@ -73,8 +76,58 @@ public class Board {
 		return valid;
 	}
 	
-	public boolean checkIfPointEmpty() {
-		return true;
+	public boolean checkIfPointEmpty(char ch) {
+		boolean pointEmpty = false;
+		
+		if((Point)MapPoints.get(ch) == Point.EMPTY) {
+			pointEmpty = true;
+		}
+
+		return pointEmpty;
 	}
+	
+	public void FillPoint(char selectedPoint, String value) {
+		Point valuePoint = Point.EMPTY;
+		
+		if(value == "W") {
+			valuePoint = Point.W;
+		}else if(value == "Z"){
+			valuePoint = Point.Z;
+		}
+		
+		MapPoints.put(selectedPoint, valuePoint);
+	}
+	
+	public boolean hasMill(String playerColor) {
+		int count;
+
+		for (int i = 0; i < Mills.length; i++) {
+			
+			count = 0;
+			
+			for (char ch: Mills[i].toCharArray()) {
+				
+				Point valuePoint = (Point)MapPoints.get(ch);
+				
+				if(playerColor == "Z") {
+					if(valuePoint == Point.Z) {
+						count++;
+					}
+				}else if(playerColor == "W") {
+					if(valuePoint == Point.W) {
+						count++;
+					}
+				}
+			}
+			
+			if(count == 3) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
 		
 }
