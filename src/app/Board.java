@@ -24,7 +24,7 @@ public class Board {
 		boardGame = BoardGeometric.LAYOUT;	
 		Mills = BoardGeometric.MILLS;
 	}
-	
+		
 	public void printBoard()
 	{
 		String Board = "";
@@ -98,11 +98,13 @@ public class Board {
 		}else {
 			valuePoint = Point.EMPTY;
 		}
-		
-		if((Point)MapPoints.get(selectedPoint) == Point.W || (Point)MapPoints.get(selectedPoint) == Point.Z) {
-			this.BoardError = 4;
-			this.BoardPrintErrorMsg();
-			return false;
+	
+		if( valuePoint != Point.EMPTY) {
+			if((Point)MapPoints.get(selectedPoint) == Point.W || (Point)MapPoints.get(selectedPoint) == Point.Z) {
+				this.BoardError = 4;
+				this.BoardPrintErrorMsg();
+				return false;
+			}
 		}
 		
 		MapPoints.put(selectedPoint, valuePoint);
@@ -191,6 +193,40 @@ public class Board {
 		
 	}
 	
+	public boolean playerCanMove(String colorPlayer) {
+		
+		String PlayerPoints = this.getPointPlayer(colorPlayer);
+		
+		String[] allMoves = {"ABCOXWVJA", "DEFNUTSKD", "GHIMRQPLG", "BEH", "ONM", "WTQ", "JKL"};
+		
+		for(int i = 0; i < PlayerPoints.length(); i++) {
+			for(int x = 0; x < allMoves.length;x++) {
+				for(int y = 0; y < allMoves[x].length(); y++) {
+					
+					if(PlayerPoints.charAt(i) == allMoves[x].charAt(y)) {
+						
+						int next = y + 1;
+						
+						if(allMoves[x].length() < next) {
+							if(this.checkIfPointEmpty(allMoves[x].charAt(next))) {
+								return true;
+							}
+						}else if(y > 0){
+							
+							int previous = y - 1;
+							
+							if(this.checkIfPointEmpty(allMoves[x].charAt(previous))) {
+								return true;
+							}
+						}												
+					}					
+				}
+			}
+		}
+		
+		return false;	
+	}
+	
 	
 	private String getMillsPlayer(String colorPlayer) {
 		
@@ -248,10 +284,8 @@ public class Board {
 				return false;
 			}
 		}
-		
-		
+			
 		return this.FillPoint(mp, "EMPTY");
-
 	}
 	
 	private void BoardPrintErrorMsg() {
@@ -265,22 +299,51 @@ public class Board {
 		break;
 		case 4:System.out.println("*** Dat punt is al bezet ***");		
 		break;
+		case 5:System.out.println("*** Punten zijn niet met elkaar verbonden ***");		
+		break;
+		case 6:System.out.println("*** Daar staat geen pion van jou ***");		
+		break;
 		}
 		
 		this.BoardClearErrors();
 	}
 	
-	private boolean BoardHasError() {
-		
-		if(this.BoardError > 0) {
-			return true;
-		}
-		
-		return false;
-	}
 	
 	private void BoardClearErrors() {
 		this.BoardError = 0;
+	}
+	
+	public boolean movePoint(char PointFrom, char Pointto, String PlayerColor) {
+		
+		Point Playerval = this.getPlayerVal(PlayerColor);
+		
+		if(this.checkIfPointEmpty(Pointto)) {
+			
+			if((Point)MapPoints.get(PointFrom) == Playerval) {
+				
+				if(BoardGeometric.areConnected(PointFrom, Pointto)) {
+					
+					this.FillPoint(PointFrom, "EMPTY");
+					
+					this.FillPoint(Pointto, PlayerColor);
+					
+					return true;
+					
+				}else {
+					this.BoardError = 5;
+				}
+				
+			}else {
+				this.BoardError = 6;
+			}
+			
+		}else {
+			this.BoardError = 4;
+		}
+		
+		
+		this.BoardPrintErrorMsg();
+		return false;
 	}
 		
 }
