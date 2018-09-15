@@ -1,10 +1,10 @@
 package app;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
 
 public class Board {
 	
@@ -13,6 +13,7 @@ public class Board {
 	private int Wpieces = 0;
 	private int Bpieces = 0;
 	private String[] Mills;
+	private int BoardError;
 	
 	public Board()
 	{	
@@ -64,16 +65,17 @@ public class Board {
 	}
 	
 	public boolean checkIfValidPoint(String Point) {
-		boolean valid = true;
 		
 		for (char ch: Point.toCharArray()) {
 			
-			if(ch < 65 || ch > 88 ) {
-				valid = false;
+			if(ch < 65 || ch > 88 ) {				
+				this.BoardError = 1;
+				this.BoardPrintErrorMsg();
+				return false;
 			}
 		}
-
-		return valid;
+	
+		return true;
 	}
 	
 	public boolean checkIfPointEmpty(char ch) {
@@ -86,48 +88,199 @@ public class Board {
 		return pointEmpty;
 	}
 	
-	public void FillPoint(char selectedPoint, String value) {
+	public boolean FillPoint(char selectedPoint, String value) {
 		Point valuePoint = Point.EMPTY;
 		
 		if(value == "W") {
 			valuePoint = Point.W;
 		}else if(value == "Z"){
 			valuePoint = Point.Z;
+		}else {
+			valuePoint = Point.EMPTY;
+		}
+		
+		if((Point)MapPoints.get(selectedPoint) == Point.W || (Point)MapPoints.get(selectedPoint) == Point.Z) {
+			this.BoardError = 4;
+			this.BoardPrintErrorMsg();
+			return false;
 		}
 		
 		MapPoints.put(selectedPoint, valuePoint);
+		return true;
 	}
 	
-	public boolean hasMill(String playerColor) {
+	public boolean hasMill(String playerColor, Character Cpoint) {
 		int count;
 
 		for (int i = 0; i < Mills.length; i++) {
 			
 			count = 0;
-			
-			for (char ch: Mills[i].toCharArray()) {
-				
-				Point valuePoint = (Point)MapPoints.get(ch);
-				
-				if(playerColor == "Z") {
-					if(valuePoint == Point.Z) {
-						count++;
-					}
-				}else if(playerColor == "W") {
-					if(valuePoint == Point.W) {
-						count++;
+			boolean found = false;
+			for (char ch: Mills[i].toCharArray() ) {
+			    if ( ch == Cpoint) {
+			        found = true;					
+		        	break;
+			    }
+			}		
+			if(found) {
+				for (char ch: Mills[i].toCharArray()) {
+					Point valuePoint = (Point)MapPoints.get(ch);
+					
+					if(playerColor == "Z") {
+						if(valuePoint == Point.Z) {
+							count++;
+						}
+					}else if(playerColor == "W") {
+						if(valuePoint == Point.W) {
+							count++;
+						}
 					}
 				}
-			}
 			
-			if(count == 3) {
-				return true;
+				if(count == 3) {
+					return true;
+				}
 			}
 		}
 		
 		return false;
 	}
 	
+	private Point getPlayerVal(String colorPlayer) {
+		
+		Point pointValue = null;
+		
+		if(colorPlayer == "W") {
+			pointValue = Point.W;
+		}else if(colorPlayer == "Z") {
+			pointValue = Point.Z;
+		}
+		
+		return pointValue;
+	}
 	
+	
+	private String getPointPlayer(String colorPlayer) {
+		
+		String[] PlayerPoints = {""};
+		Point pointValue = this.getPlayerVal(colorPlayer);
+		boolean InString = false;
+		
+		for (int i = 0; i < Mills.length; i++) {	
+			
+			for (char ch: Mills[i].toCharArray()) {	
+				
+				InString = false;
+				
+				if((Point)MapPoints.get(ch) == pointValue) {				
+					for (char mp: PlayerPoints[0].toCharArray()) {
+						if(mp == ch) {
+							InString = true;
+							break;
+						}
+					}
+					
+					if(!InString) {
+						PlayerPoints[0] += ch;
+					}					
+				}
+			}		
+		}
+		
+		return PlayerPoints[0];
+		
+	}
+	
+	
+	private String getMillsPlayer(String colorPlayer) {
+		
+		String[] PlayerMills = {""};
+		Point pointValue = this.getPlayerVal(colorPlayer);
+		int countPoint;
+		
+		for (int i = 0; i < Mills.length; i++) {
+			countPoint = 0;
+			
+			for (char ch: Mills[i].toCharArray()) {
+				if((Point)MapPoints.get(ch) == pointValue) {
+					countPoint++;
+				}
+			}	
+			
+			if(countPoint == 3) {
+				PlayerMills[0] += Mills[i];
+			}	
+		}
+		
+		return PlayerMills[0];
+	}
+	
+	
+	public boolean useMill(char mp, String opponentColor) {
+		
+		boolean cpInMill = false;
+		Point oppenentVal = this.getPlayerVal(opponentColor);
+		String opponentMills = this.getMillsPlayer(opponentColor);
+		String oppenentPoints = this.getPointPlayer(opponentColor);
+		
+		if(mp < 65 || mp > 88 ) {
+			this.BoardError = 1;
+			this.BoardPrintErrorMsg();
+			return false;
+
+
+		}else if(oppenentVal != (Point)MapPoints.get(mp)) {
+			this.BoardError = 2;	
+			this.BoardPrintErrorMsg();
+			return false;
+		}
+		
+		for (char ch: opponentMills.toCharArray() ) {
+			if(ch == mp) {
+				cpInMill = true;
+			}
+		}
+		
+		if(cpInMill) {
+			if(opponentMills.length() < oppenentPoints.length()) {
+				this.BoardError = 3;
+				this.BoardPrintErrorMsg();
+				return false;
+			}
+		}
+		
+		
+		return this.FillPoint(mp, "EMPTY");
+
+	}
+	
+	private void BoardPrintErrorMsg() {
+		
+		switch(this.BoardError) {
+		case 1:System.out.println("*** Dat punt bestaat niet ***");		
+		break;
+		case 2:System.out.println("*** Dat punt bevat geen pion van je tegenstander ***");		
+		break;
+		case 3:System.out.println("*** Die pion van je tegenstander mag je niet pakken ***");		
+		break;
+		case 4:System.out.println("*** Dat punt is al bezet ***");		
+		break;
+		}
+		
+		this.BoardClearErrors();
+	}
+	
+	private boolean BoardHasError() {
+		
+		if(this.BoardError > 0) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void BoardClearErrors() {
+		this.BoardError = 0;
+	}
 		
 }

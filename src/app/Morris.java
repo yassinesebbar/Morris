@@ -62,6 +62,10 @@ public class Morris {
 	}
 	
 	
+	
+	
+	
+	
 	private void Play()
 	{
 		Board Board = new Board();
@@ -87,23 +91,31 @@ public class Morris {
 						
 						if(Board.checkIfValidPoint(WPoint)) {
 							if(fase == 1) {
-								for (char ch: WPoint.toCharArray()) {
-									
+								for (char ch: WPoint.toCharArray()) {									
 									if(Board.checkIfPointEmpty(ch)) {
-										Board.FillPoint(ch, White.getColor());
+										if(Board.FillPoint(ch, White.getColor())) {
+											White.minusOnepiece();
+											while(Board.hasMill(White.getColor(), ch)) {
+												
+									        	System.out.println(White.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");
+									        	
+									        	String MillPoint = SC.nextLine().toUpperCase();
+												
+												char mp = this.returnChar(MillPoint);
+												
+												if(Board.useMill(mp, Black.getColor())) {
+													break;
+												}
+											}
+										}
+										break;
 									}
 									break;
 								}
 							}
 						}else {
 				        	System.out.println("*** Dat punt bestaat niet ***");					
-						}
-						
-						while(Board.hasMill(White.getColor())) {
-				        	System.out.println(White.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");					
-							String MillPoint = SC.nextLine().toUpperCase();
-
-						}
+						}					
 						
 						break;
 					}
@@ -128,6 +140,19 @@ public class Morris {
 									if(Board.checkIfPointEmpty(ch)) {
 										Board.FillPoint(ch, Black.getColor());
 										Black.minusOnepiece();
+										while(Board.hasMill(Black.getColor(), ch)) {
+											
+								        	System.out.println(Black.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");
+								        	
+											String MillPoint = SC.nextLine().toUpperCase();
+									
+											char mp = this.returnChar(MillPoint);
+											
+											if(Board.useMill(mp, White.getColor())) {
+												break;
+											}
+											
+										}
 									}
 									
 									break;
@@ -138,6 +163,8 @@ public class Morris {
 				        	System.out.println("*** Dat punt bestaat niet ***");					
 						}
 						
+					
+						
 						if(fase == 1 && Black.getPieces() == 0) {
 							fase++;
 							continue GAME;
@@ -146,15 +173,65 @@ public class Morris {
 						break;
 						
 					}
-					
-					
-	
 			}
 			
 		}
 	}
 
-
+	private void firstFase(Board Board, Player player, Player oponent) {
+		if(fase == 1) {
+        	System.out.println(White.getUsername() + ", geef het punt waar je een pion wilt zetten ");					
+		}	
+		
+		String WPoint = SC.nextLine().toUpperCase();
+		if(WPoint.equals("") || WPoint.equals(" ")) {
+			continue;
+		}
+		
+		if(Board.checkIfValidPoint(WPoint)) {
+			if(fase == 1) {
+				for (char ch: WPoint.toCharArray()) {									
+					if(Board.checkIfPointEmpty(ch)) {
+						if(Board.FillPoint(ch, White.getColor())) {
+							White.minusOnepiece();
+							while(Board.hasMill(White.getColor(), ch)) {
+								
+					        	System.out.println(White.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");
+					        	
+					        	String MillPoint = SC.nextLine().toUpperCase();
+								
+								char mp = this.returnChar(MillPoint);
+								
+								if(Board.useMill(mp, Black.getColor())) {
+									break;
+								}
+							}
+						}
+						break;
+					}
+					break;
+				}
+			}
+		}else {
+        	System.out.println("*** Dat punt bestaat niet ***");					
+		}					
+		
+		break;
+	}
+	
+	
+	private char returnChar(String userInput) {
+		
+		char charactr = 'Z';
+		
+		for (char ch: userInput.toCharArray()) {
+			charactr = ch;			
+			break;
+		}
+		
+		return charactr;
+	}
+	
 	/**
 	 * @return the player2
 	 */
