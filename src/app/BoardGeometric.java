@@ -100,7 +100,7 @@ public abstract class BoardGeometric
 
 	// Een stukje code om de connecties te berekenen
 	
-	static
+	static 
 	{
 		for (int i = 0; i < SEQUENCES.length; i++)
 		{

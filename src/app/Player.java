@@ -1,9 +1,10 @@
 package app;
 
 public class Player {
-	private String username;
+	protected String username;
 	private String color;
 	private int pieces = 9;
+	protected boolean isHuman = true;
 	
 	public Player(String name) {
 		username = name;
@@ -25,8 +26,16 @@ public class Player {
 		return pieces;
 	}
 	
+	public void resetPlayer() {
+		this.pieces = 9;
+	}
+	
 	public int minusOnepiece() {
 		return pieces--;
+	}
+	
+	public boolean getHumanity() {
+		return this.isHuman;
 	}
 	
 }

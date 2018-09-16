@@ -1,11 +1,12 @@
 package app;
 
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class Morris {
 	
 	private Boolean running = true;
-	private int fase = 1;;
+	private int fase = 1;
 	private boolean skipRound = false;
 	private Player White;
 	private Player Black;
@@ -14,36 +15,85 @@ public class Morris {
 	private boolean GameOver = false;
 	
 	
+	
+	/**
+	 * Constructor
+	 */
+	
 	public Morris()
 	{
+		Player Player1;
 		Player Player2;
-		
-		System.out.println("Give the name of Player 1 or type 'C' for a computer");
-		
-			String NamePlayer1 = SC.nextLine();
-			Player Player1 = new Player(NamePlayer1);
 
-			if(NamePlayer1.compareTo("test") == 0) {
-				this.skipRound = true;
-			}
+		System.out.println("Welkom bij het aloude Molenspel!");
+
+		System.out.println("Geef de naam van speler 1 (of een C voor een computer");
+		
+		String NamePlayer1 = SC.nextLine();
 			
-        System.out.println("Give the name of Player 2 or type 'C' for a computer");
+		if(!NamePlayer1.equals("C")) {
+			
+			if(NamePlayer1.equals("test")) {
+				this.skipRound = true;
+			}				
+			 Player1 = new Player(NamePlayer1);				
+		}else {				
+			 Player1 = new Computer(NamePlayer1);
+		}
+			
+			
+			
+        System.out.println("Geef de naam van speler 2 (of een C voor een computer");
 
-	        while(true) {
-				String NamePlayer2 = SC.nextLine();
-				
-				if(NamePlayer2.equals(Player1.getUsername())) {
-			        System.out.println("You have to choose a different name!");
+        while(true) {
+			String NamePlayer2 = SC.nextLine();
+			
+			if(NamePlayer2.equals(Player1.getUsername()) && !NamePlayer2.equals("C")) {
+		        System.out.println("Dat naam is al bezet kies een andere naam");
+			}else {
+				if(!NamePlayer2.equals("C")) {
+					Player2 = new Player(NamePlayer2);
+					break;
 				}else {
-				    Player2 = new Player(NamePlayer2);
+					Player2 = new Computer(NamePlayer2);
 					break;
 				}
-	        }
-	        
-
+			   
+			}
+        }
+        
+    	draw(Player1, Player2);
+    	
+		Play();
+		
+		while(GameOver) {
+        	System.out.println("Wil je nog een keer spelen (ja/nee)? ");					
+			String anser = SC.nextLine();
+			
+			if(anser.equals("ja")) {
+				this.resetGame();
+				this.Play();
+				
+			}else {
+	        	System.out.println("Bedankt voor het spelen van het aloude Molenspel.");					
+	        	System.out.println("Hopelijk tot een volgende keer!");					
+			}
+		
+		}		
+	}
+		
+	/**
+	 * return nothing
+	 * 
+	 * it is for to determine who will begin
+	 */
+	
+	
+	private void draw(Player Player1, Player Player2) 
+	{
         int turn = (int)(Math.random() * 2) + 1;
         
-    	System.out.println("The draw was done.");
+    	System.out.println("Loting is verricht");
 
         if(turn == 1) {     	
         	Black = Player2;
@@ -55,28 +105,41 @@ public class Morris {
         
     	White.setColor("W");
     	Black.setColor("Z");
-       	System.out.println(Black.getUsername() + " has Black");
-    	System.out.println(White.getUsername() + " has White");
-    	
-    	
-		Play();
+    	System.out.println(White.getUsername() + " heeft Wit");
+       	System.out.println(Black.getUsername() + " heeft Zwart");
 	}
-		
+	
+	/**
+	 * return nothing
+	 * 
+	 * Initiates the game
+	 */
 	
 	private void Play()
 	{		
 		Board Board = new Board();
 		this.Test(Board);
+		Player[] playersArr = {White, Black};
+		int x = 1;
 		
 		GAME:
 		while(running) {
         	System.out.println("*** Fase " + this.fase + " van het spel begint nu *** ");
+       	
 			while(this.fase > 0) {
-				       					
-				this.playersTurn(Board, White, Black);
-								
-				this.playersTurn(Board, Black, White);
+				   
 				
+				for(int i = 0; i < playersArr.length; i++) {
+					
+					if(i == 0) {
+						x = 1;
+					}else {
+						x = 0;
+					}
+					
+					this.playersTurn(Board, playersArr[i], playersArr[x]);
+				}
+												
 				if(this.isNextRound()) {
 					continue GAME;
 				}
@@ -87,8 +150,31 @@ public class Morris {
 			}				
 				
 		}
+		
+		Board = null;
 	}
 
+	/**
+	 * return nothing
+	 * 
+	 * resets all game variables
+	 */
+	
+	private void resetGame() {
+		this.GameOver = false;
+		this.fase = 1;
+		this.rounds = 0;
+		White.resetPlayer();
+		Black.resetPlayer();
+		
+	}
+	
+	/**
+	 * return nothing
+	 * 
+	 * Handles game fases
+	 */
+	
 	private void playersTurn(Board Board, Player player, Player oppenent) {
 		
 		if(this.noOptionsPlayer(Board, player)) {
@@ -101,25 +187,56 @@ public class Morris {
 			boolean playerMove = false;
 			
 			String WPoint = "";
-			
-			Board.printBoard();
+			if(player.getHumanity()) {
+				Board.printBoard();
+			}
 			
 			if(this.fase == 1) {		
-			
-	        	System.out.println(player.getUsername() + ", geef het punt waar je een pion wilt zetten ");					
-				
-	        	WPoint = SC.nextLine().toUpperCase();
-	
+				if(player.getHumanity()) {
+					
+		        	System.out.println(player.getUsername() + ", geef het punt waar je een pion wilt zetten ");					
+					 
+	        		WPoint = SC.nextLine().toUpperCase();
+	        		
+				}else {
+					
+					String emptyPoints = Board.giveEmptyPoints();
+					
+					WPoint = ((Computer)player).CpPlacePoint(emptyPoints);
+					
+		        	System.out.println(player.getUsername() + ", zet een pion op punt " + WPoint);					
+
+				}
+
 				playerMove = this.faseOne(Board, player, WPoint);
-			
+	       
 			}else if(this.fase == 2) {
 				
-	        	System.out.println(player.getUsername() + ", geef aan welke pion je wilt verzetten en waarheen");					
+				String PPoints = "";
 				
-	        	String PPoints = SC.nextLine().toUpperCase();
+				if(player.getHumanity()) {
+					System.out.println(player.getUsername() + ", geef aan welke pion je wilt verzetten en waarheen");					
+					
+		            PPoints = SC.nextLine().toUpperCase();
+										
+				}else {
+					
+					HashSet<String> Connects = Board.getConnects();
+					String[] PcPoints = Board.getPointsandMillsPlayer(player.getColor());
+					String EmptyPoints = Board.giveEmptyPoints();
+
+					
+					
+					PPoints = ((Computer)player).movePoint(PcPoints[0], EmptyPoints,  Connects);
+					
+					String pointa = Character.toString(PPoints.charAt(0));
+					String pointb = Character.toString(PPoints.charAt(1));
+					System.out.println(player.getUsername() + ", zet de pion van "+ pointa +" naar " + pointb);					
+
+				}
 				
-				playerMove = this.faseTwo(Board, player, PPoints);
-				
+				playerMove = this.faseTwo(Board, player, PPoints);				
+
 				WPoint = Character.toString(PPoints.charAt(1));
 			}
 		
@@ -135,6 +252,12 @@ public class Morris {
 		}
 	}
 	
+	/**
+	 * return boolean
+	 * 
+	 * checks if next round neads to begin so yes add 1 to fase
+	 */
+	
 	private boolean isNextRound() {
 		this.rounds++;
 		
@@ -146,6 +269,12 @@ public class Morris {
 		return false;
 	}
 	
+	/**
+	 * return boolean
+	 * 
+	 * this is where faseone happens it returns boolean if faseone succeeded or not
+	 */
+	
 	private boolean faseOne(Board Board, Player player, String PPoint) {
 		
 		char ch = this.returnChar(PPoint);
@@ -154,11 +283,19 @@ public class Morris {
 			if(Board.FillPoint(ch, player.getColor())) {
 				return true;
 			}
+
         	return false;
 		}				
-		
+    	System.out.println("*** Dat Punt is al bezet ***");
+
 		return false;
 	}
+	
+	/**
+	 * returns boolean
+	 * 
+	 * this is where fasetwo happens it returns boolean if fase succeeded or not
+	 */
 	
 	private boolean faseTwo(Board Board, Player player, String PPoints) {
 		
@@ -176,13 +313,31 @@ public class Morris {
 		return false; 
 	}
 	
+	/**
+	 * returns nothing
+	 * 
+	 * Handels all the mills
+	 */
+	
 	private void checkMill(boolean hasMill, Player player, Player opponent, Board Board) {
 		while(hasMill) {
 			
-        	System.out.println(player.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");
-        	
-        	String MillPoint = SC.nextLine().toUpperCase();
+			String MillPoint;
 			
+			if(player.getHumanity()) {
+				System.out.println(player.getUsername() + ", je hebt een molentje! Geef de pion die je wilt pakken");
+	        	
+	        	 MillPoint = SC.nextLine().toUpperCase();	
+			}else {
+				
+				String[] oppenentMills = Board.getPointsandMillsPlayer(opponent.getColor());
+				
+				MillPoint = ((Computer)player).useMill(oppenentMills);	
+				
+				System.out.println(player.getUsername() + ", pakt de pion op punt "+ MillPoint);
+
+			}
+      			
 			char mp = this.returnChar(MillPoint);
 			
 			if(Board.useMill(mp, opponent.getColor())) {
@@ -197,7 +352,6 @@ public class Morris {
 	
 	private void Test(Board Board) {
 		if(this.fase == 1) {
-			System.out.println(this.skipRound);
 
 			if(this.skipRound) {
 				
@@ -228,7 +382,7 @@ public class Morris {
 	
 	private boolean noOptionsPlayer(Board Board, Player player) {	
 		
-		if(player.getPieces() == 2 || !Board.playerCanMove(player.getColor())) {		
+		if(player.getPieces() == 2 || !Board.playerCanMove(player.getColor()) && this.fase == 2) {		
 			return true;
 		}
 		
